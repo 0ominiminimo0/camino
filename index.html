@@ -221,6 +221,96 @@ input[type=range]::-webkit-slider-thumb {
 }
 #temp { background: linear-gradient(to right, #a8c8e8, var(--border) 50%, #e8b87a); }
 
+
+/* ══ MIX MODE ══ */
+.mix-toggle {
+  width: 100%;
+  height: 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 10px;
+  background: var(--tag);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 500;
+  color: var(--ink); cursor: pointer;
+  transition: all 0.12s; margin-bottom: 10px;
+}
+.mix-toggle:hover { background: #e8e8e8; }
+.mix-toggle.active { background: #6c5ce7; color: #fff; border-color: #6c5ce7; }
+.mix-badge {
+  font-size: 10px;
+  background: rgba(255,255,255,0.25);
+  padding: 1px 6px; border-radius: 10px;
+}
+.mix-toggle:not(.active) .mix-badge { background: var(--border); color: var(--muted); }
+
+/* Mix mode: filter pills get checkboxes */
+.mix-mode .filter-pill { padding-left: 8px; }
+.mix-check {
+  width: 14px; height: 14px;
+  border: 1.5px solid #ccc;
+  border-radius: 3px;
+  flex-shrink: 0;
+  display: none;
+  align-items: center; justify-content: center;
+  font-size: 9px;
+  transition: all 0.1s;
+}
+.mix-mode .mix-check { display: flex; }
+.filter-pill.mix-selected .mix-check {
+  background: #6c5ce7;
+  border-color: #6c5ce7;
+  color: #fff;
+}
+.filter-pill.mix-selected {
+  border-color: #6c5ce7;
+  background: rgba(108,92,231,0.08);
+  color: var(--ink);
+}
+
+/* Mix selected chips row */
+.mix-selected-row {
+  display: none;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+.mix-selected-row.visible { display: flex; }
+.mix-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  height: 22px; padding: 0 8px;
+  background: #6c5ce7; color: #fff;
+  border-radius: 11px; font-size: 10px;
+  cursor: pointer;
+}
+.mix-chip:after { content: '×'; font-size: 12px; opacity: 0.7; }
+
+/* Mix apply button */
+.mix-apply-btn {
+  width: 100%; height: 34px;
+  background: #6c5ce7; color: #fff;
+  border: none; border-radius: 5px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 500;
+  cursor: pointer; margin-top: 10px;
+  display: none;
+  transition: background 0.12s;
+}
+.mix-apply-btn:hover { background: #5a4bd1; }
+.mix-apply-btn.visible { display: block; }
+
+/* Mobile mix sheet */
+.mix-mobile-btn {
+  height: 32px; padding: 0 14px;
+  background: #6c5ce7; color: #fff;
+  border: none; border-radius: 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px; font-weight: 500;
+  cursor: pointer; flex-shrink: 0;
+  white-space: nowrap;
+}
+
 /* ══ MOBILE ══ */
 @media (max-width: 640px) {
   /* 하단 패널 높이 변수 — 필터칩 + 강도슬라이더 + safe area */
@@ -435,6 +525,17 @@ input[type=range]::-webkit-slider-thumb {
 
     <div class="sb-divider desktop-only"></div>
 
+    <div class="sb-section desktop-only" style="padding-top:14px; padding-bottom:14px;" id="mixSection">
+      <button class="mix-toggle" id="mixToggleBtn">
+        MIX
+        <span class="mix-badge" id="mixBadge">0/4</span>
+      </button>
+      <div id="mixSelectedRow" class="mix-selected-row"></div>
+      <button class="mix-apply-btn" id="mixApplyBtn">믹스 적용</button>
+    </div>
+
+    <div class="sb-divider desktop-only"></div>
+
     <div class="sb-section" style="padding-top:14px; padding-bottom:14px;">
       <div class="sb-label">필터 강도</div>
       <div class="sl-row" style="margin-bottom:0">
@@ -481,7 +582,7 @@ input[type=range]::-webkit-slider-thumb {
             <input type="range" id="sharpen" min="0" max="100" value="0">
           </div>
         </div>
-        <div class="slider-group" style="margin-bottom:0">
+        <div class="slider-group">
           <div class="slider-group-label">색온도</div>
           <div class="sl-row" style="margin-bottom:0">
             <div class="sl-head">
@@ -490,6 +591,13 @@ input[type=range]::-webkit-slider-thumb {
               <span style="color:#d4895a; font-size:10px">따뜻함</span>
             </div>
             <input type="range" id="temp" min="-100" max="100" value="0">
+          </div>
+        </div>
+        <div class="slider-group" style="margin-bottom:0">
+          <div class="slider-group-label">그레인</div>
+          <div class="sl-row" style="margin-bottom:0">
+            <div class="sl-head">강도 <b id="grainVal">0</b></div>
+            <input type="range" id="grain" min="0" max="100" value="0">
           </div>
         </div>
       </div>
@@ -504,6 +612,7 @@ input[type=range]::-webkit-slider-thumb {
           <input type="range" id="intensityMobile" min="0" max="100" value="100">
           <b id="intensityValMobile" style="min-width:28px;text-align:right;color:#111">100%</b>
         </div>
+        <button class="mix-mobile-btn" id="mixMobileBtn">MIX</button>
         <button class="adjust-toggle" id="adjustBtnMobile" style="width:auto;padding:0 12px;flex-shrink:0">
           조절 <span class="toggle-arrow" id="mobileArrow">▾</span>
         </button>
@@ -547,7 +656,7 @@ input[type=range]::-webkit-slider-thumb {
       <input type="range" id="sharpenM" min="0" max="100" value="0">
     </div>
   </div>
-  <div class="slider-group" style="margin-bottom:0">
+  <div class="slider-group">
     <div class="slider-group-label">색온도</div>
     <div class="sl-row" style="margin-bottom:0">
       <div class="sl-head">
@@ -556,6 +665,13 @@ input[type=range]::-webkit-slider-thumb {
         <span style="color:#d4895a;font-size:10px">따뜻함</span>
       </div>
       <input type="range" id="tempM" min="-100" max="100" value="0" style="background: linear-gradient(to right, #a8c8e8, #ebebeb 50%, #e8b87a)">
+    </div>
+  </div>
+  <div class="slider-group" style="margin-bottom:0">
+    <div class="slider-group-label">그레인</div>
+    <div class="sl-row" style="margin-bottom:0">
+      <div class="sl-head">강도 <b id="grainValM">0</b></div>
+      <input type="range" id="grainM" min="0" max="100" value="0">
     </div>
   </div>
 </div>
@@ -639,6 +755,7 @@ const mobileSliderMap = {
   blurM:       ['blur','blVal','blValM'],
   sharpenM:    ['sharpen','shVal','shValM'],
   tempM:       ['temp','tempVal','tempValM'],
+  grainM:      ['grain','grainVal','grainValM'],
 };
 Object.entries(mobileSliderMap).forEach(([mId, [dId, dVal, mVal]]) => {
   document.getElementById(mId).addEventListener('input', function() {
@@ -766,11 +883,12 @@ function getSliders() {
     sh:        parseFloat(document.getElementById('sharpen').value),
     temp:      parseFloat(document.getElementById('temp').value),
     intensity: parseFloat(document.getElementById('intensity').value) / 100,
+    grain:     parseFloat(document.getElementById('grain').value),
   };
 }
 
 function resetSliders() {
-  const map = { brightness:'bVal', contrast:'cVal', saturation:'sVal', exposure:'eVal', blur:'blVal', sharpen:'shVal', temp:'tempVal' };
+  const map = { brightness:'bVal', contrast:'cVal', saturation:'sVal', exposure:'eVal', blur:'blVal', sharpen:'shVal', temp:'tempVal', grain:'grainVal' };
   Object.keys(map).forEach(id => {
     document.getElementById(id).value = 0;
     document.getElementById(map[id]).textContent = '0';
@@ -780,7 +898,7 @@ function resetSliders() {
   syncMobileSliders();
 }
 
-const sliderMap = { brightness:'bVal', contrast:'cVal', saturation:'sVal', exposure:'eVal', blur:'blVal', sharpen:'shVal', temp:'tempVal' };
+const sliderMap = { brightness:'bVal', contrast:'cVal', saturation:'sVal', exposure:'eVal', blur:'blVal', sharpen:'shVal', temp:'tempVal', grain:'grainVal' };
 Object.keys(sliderMap).forEach(id => {
   document.getElementById(id).addEventListener('input', function() {
     document.getElementById(sliderMap[id]).textContent = this.value;
@@ -1253,6 +1371,36 @@ function applyPrague(imgEl, w, h) {
   ctx.putImageData(gd, 0, 0);
 }
 
+// ── GRAIN ──
+function applyGrainToCanvas(amount) {
+  if (amount <= 0) return;
+  const w = canvas.width, h = canvas.height;
+  // Temporarily flatten CSS filter into canvas pixels so grain sits on top
+  const flat = document.createElement('canvas');
+  flat.width = w; flat.height = h;
+  const fCtx = flat.getContext('2d');
+  fCtx.filter = canvas.style.filter || 'none';
+  fCtx.drawImage(canvas, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  ctx.filter = 'none';
+  ctx.drawImage(flat, 0, 0);
+  canvas.style.filter = 'none';
+
+  // Add grain
+  const id = ctx.getImageData(0, 0, w, h);
+  const d = id.data;
+  const strength = amount * 0.45; // scale: 0-100 → subtle to strong
+  for (let i = 0; i < d.length; i += 4) {
+    const n = (Math.random() - 0.5) * strength * 2;
+    // Slight color variation for film-like grain
+    const nc = (Math.random() - 0.5) * strength * 0.3;
+    d[i]   = Math.min(255, Math.max(0, d[i]   + n + nc));
+    d[i+1] = Math.min(255, Math.max(0, d[i+1] + n));
+    d[i+2] = Math.min(255, Math.max(0, d[i+2] + n - nc));
+  }
+  ctx.putImageData(id, 0, 0);
+}
+
 // ── RENDER ──
 function render() {
   if (!originalImg) return;
@@ -1303,6 +1451,9 @@ function render() {
     ctx.drawImage(originalImg, 0, 0, w, h);
     canvas.style.filter = getFullCSS();
   }
+
+  // Apply grain on top (pixel pass, after filter)
+  if (sliders.grain > 0) applyGrainToCanvas(sliders.grain);
 }
 // ── BUTTONS ──
 document.getElementById('resetBtn').addEventListener('click', () => pickFilter('none'));
@@ -1337,6 +1488,356 @@ document.getElementById('dlBtn').addEventListener('click', () => {
   a.click();
 });
 
+// ══ MIX MODE ══
+let mixMode = false;
+let mixSelected = []; // array of filter ids
+const MAX_MIX = 4;
+
+function setMixMode(on) {
+  mixMode = on;
+  const btn = document.getElementById('mixToggleBtn');
+  const filterListEl = document.getElementById('filterList');
+  if (btn) btn.classList.toggle('active', on);
+  if (filterListEl) filterListEl.classList.toggle('mix-mode', on);
+  // Add mix-check spans to pills if not already there
+  document.querySelectorAll('#filterList .filter-pill').forEach(pill => {
+    if (!pill.querySelector('.mix-check')) {
+      const chk = document.createElement('span');
+      chk.className = 'mix-check';
+      chk.textContent = '✓';
+      pill.insertBefore(chk, pill.firstChild);
+    }
+  });
+  updateMixUI();
+}
+
+function toggleMixFilter(id) {
+  if (id === 'none') return;
+  const idx = mixSelected.indexOf(id);
+  if (idx >= 0) {
+    mixSelected.splice(idx, 1);
+  } else {
+    if (mixSelected.length >= MAX_MIX) return;
+    mixSelected.push(id);
+  }
+  updateMixUI();
+  if (mixSelected.length >= 2) renderMix();
+  else render(); // fall back to normal if <2 selected
+}
+
+function updateMixUI() {
+  const count = mixSelected.length;
+  // Desktop badge
+  const badge = document.getElementById('mixBadge');
+  if (badge) badge.textContent = count + '/' + MAX_MIX;
+
+  // Desktop apply btn
+  const applyBtn = document.getElementById('mixApplyBtn');
+  if (applyBtn) applyBtn.classList.toggle('visible', count >= 2);
+
+  // Desktop selected chips row
+  updateMixChipsRow('mixSelectedRow');
+  updateMixChipsRow('mixSheetSelectedRow');
+
+  // Highlight pills in both lists
+  ['filterList', 'mixSheetFilterList'].forEach(listId => {
+    const list = document.getElementById(listId);
+    if (!list) return;
+    list.querySelectorAll('.filter-pill').forEach(pill => {
+      const selected = mixSelected.includes(pill.dataset.id);
+      pill.classList.toggle('mix-selected', selected);
+    });
+  });
+
+  // Mobile mix count label
+  const countLabel = document.getElementById('mixCountLabel');
+  if (countLabel) countLabel.textContent = count >= 2 ? count + '개 선택됨' : '최대 4개 선택';
+
+  // Mobile apply btn
+  const mobileApply = document.getElementById('mixApplyMobileBtn');
+  if (mobileApply) mobileApply.classList.toggle('visible', count >= 2);
+
+  // Mobile mix btn badge
+  const mobileBtn = document.getElementById('mixMobileBtn');
+  if (mobileBtn) {
+    mobileBtn.textContent = count >= 2 ? 'MIX ' + count : 'MIX';
+    mobileBtn.style.background = count >= 2 ? '#6c5ce7' : '#999';
+  }
+}
+
+function updateMixChipsRow(rowId) {
+  const row = document.getElementById(rowId);
+  if (!row) return;
+  row.innerHTML = '';
+  if (mixSelected.length === 0) { row.classList.remove('visible'); return; }
+  row.classList.add('visible');
+  mixSelected.forEach(id => {
+    const f = FILTERS.find(f => f.id === id);
+    if (!f) return;
+    const chip = document.createElement('div');
+    chip.className = 'mix-chip';
+    chip.textContent = f.name;
+    chip.addEventListener('click', () => { toggleMixFilter(id); if (mixSelected.length >= 2) renderMix(); else render(); });
+    row.appendChild(chip);
+  });
+}
+
+// Core mix render — render each filter to offscreen, blend equally
+function renderMix() {
+  if (!originalImg || mixSelected.length < 2) return;
+  const w = originalImg._w, h = originalImg._h;
+  const n = mixSelected.length;
+  const alpha = 1 / n;
+  const sliders = getSliders();
+
+  // Accumulator canvas
+  const accum = document.createElement('canvas');
+  accum.width = w; accum.height = h;
+  const aCtx = accum.getContext('2d');
+
+  mixSelected.forEach((filterId, i) => {
+    // Render this filter to offscreen
+    const off = document.createElement('canvas');
+    off.width = w; off.height = h;
+    const offCtx = off.getContext('2d');
+
+    if (PIXEL_FILTERS.includes(filterId)) {
+      // Temporarily redirect ctx to offscreen
+      const savedCanvas = canvas;
+      // We need to render pixel filter onto `off`
+      // Use a trick: temporarily draw to off via a proxy
+      offCtx.drawImage(originalImg, 0, 0, w, h);
+      // Apply pixel filter by calling the function with a temp canvas swap
+      renderPixelFilterToCanvas(filterId, originalImg, w, h, off, offCtx);
+    } else {
+      const f = FILTERS.find(f => f.id === filterId);
+      const css = f.css || '';
+      offCtx.filter = css || 'none';
+      offCtx.drawImage(originalImg, 0, 0, w, h);
+      offCtx.filter = 'none';
+    }
+
+    // Blend into accumulator
+    aCtx.globalAlpha = i === 0 ? 1 : alpha * n / (i + 1);
+    // Simple equal-weight approach: each layer at 1/n opacity stacked
+    // Better: draw all at equal alpha on black, then normalize
+    // Easiest correct method: draw first at full, rest at diminishing
+  });
+
+  // Correct approach: draw each at alpha = 1/n on transparent accum
+  aCtx.clearRect(0, 0, w, h);
+  aCtx.globalAlpha = 1;
+
+  mixSelected.forEach((filterId, i) => {
+    const off = document.createElement('canvas');
+    off.width = w; off.height = h;
+    const offCtx = off.getContext('2d');
+
+    if (PIXEL_FILTERS.includes(filterId)) {
+      renderPixelFilterToCanvas(filterId, originalImg, w, h, off, offCtx);
+    } else {
+      const f = FILTERS.find(f => f.id === filterId);
+      offCtx.filter = (f.css && f.css !== '__pixel__') ? f.css : 'none';
+      offCtx.drawImage(originalImg, 0, 0, w, h);
+      offCtx.filter = 'none';
+    }
+
+    aCtx.globalAlpha = alpha;
+    aCtx.drawImage(off, 0, 0);
+  });
+
+  // Draw accumulated result to main canvas
+  ctx.clearRect(0, 0, w, h);
+  ctx.globalAlpha = 1; ctx.filter = 'none';
+  ctx.drawImage(accum, 0, 0);
+
+  // Apply slider adjustments on top
+  canvas.style.filter = buildSliderCSS(sliders);
+}
+
+// Render a pixel filter to an offscreen canvas without touching main canvas
+function renderPixelFilterToCanvas(filterId, imgEl, w, h, targetCanvas, targetCtx) {
+  // Save main canvas context state
+  const origDrawImage = ctx.drawImage.bind(ctx);
+  const origGetImageData = ctx.getImageData.bind(ctx);
+  const origPutImageData = ctx.putImageData.bind(ctx);
+  const origClearRect = ctx.clearRect.bind(ctx);
+
+  // Temporarily monkey-patch canvas reference for pixel functions
+  // by swapping the context - we use a simpler approach:
+  // copy pixel filter result by running it on a temp canvas
+
+  // Draw original onto target
+  targetCtx.clearRect(0, 0, w, h);
+  targetCtx.filter = 'none';
+  targetCtx.drawImage(imgEl, 0, 0, w, h);
+
+  // Get pixel data, process, put back
+  const id = targetCtx.getImageData(0, 0, w, h);
+  const d = id.data;
+
+  if (filterId === 'rosemilk') {
+    const tR=255,tG=184,tB=198;
+    for (let i=0;i<d.length;i+=4) {
+      let r=d[i]*1.06,g=d[i+1]*1.06,b=d[i+2]*1.06;
+      r=r*0.93+128*0.07;g=g*0.93+128*0.07;b=b*0.93+128*0.07;
+      const sR=255*(1-(1-r/255)*(1-tR/255)),sG=255*(1-(1-g/255)*(1-tG/255)),sB=255*(1-(1-b/255)*(1-tB/255));
+      d[i]=Math.min(255,Math.max(0,r*0.87+sR*0.13));d[i+1]=Math.min(255,Math.max(0,g*0.87+sG*0.13));d[i+2]=Math.min(255,Math.max(0,b*0.87+sB*0.13));
+    }
+    targetCtx.putImageData(id,0,0);
+    const tmp=document.createElement('canvas');tmp.width=w;tmp.height=h;tmp.getContext('2d').drawImage(targetCanvas,0,0);
+    targetCtx.filter='blur(0.8px)';targetCtx.globalAlpha=0.35;targetCtx.drawImage(tmp,0,0);targetCtx.globalAlpha=1;targetCtx.filter='none';
+
+  } else if (filterId === 'sunshine') {
+    const tR=255,tG=240,tB=192;
+    for (let i=0;i<d.length;i+=4) {
+      let r=d[i],g=d[i+1],b=d[i+2];
+      r=r*1.10+8;g=g*1.08+5;b=b*1.04+2;
+      const cf=0.91;r=r*cf+128*(1-cf);g=g*cf+128*(1-cf);b=b*cf+128*(1-cf);
+      const sR=255*(1-(1-r/255)*(1-tR/255)),sG=255*(1-(1-g/255)*(1-tG/255)),sB=255*(1-(1-b/255)*(1-tB/255));
+      const str=0.16;d[i]=Math.min(255,Math.max(0,r*(1-str)+sR*str));d[i+1]=Math.min(255,Math.max(0,g*(1-str)+sG*str));d[i+2]=Math.min(255,Math.max(0,b*(1-str)+sB*str));
+    }
+    targetCtx.putImageData(id,0,0);
+    const tmp=document.createElement('canvas');tmp.width=w;tmp.height=h;tmp.getContext('2d').drawImage(targetCanvas,0,0);
+    targetCtx.filter='blur(2.5px)';targetCtx.globalAlpha=0.22;targetCtx.drawImage(tmp,0,0);
+    targetCtx.filter='blur(0.8px) brightness(1.04)';targetCtx.globalAlpha=0.18;targetCtx.drawImage(tmp,0,0);
+    targetCtx.globalAlpha=1;targetCtx.filter='none';
+
+  } else if (filterId === 'dawn') {
+    const tR=184,tG=204,tB=224;
+    for (let i=0;i<d.length;i+=4) {
+      let r=d[i],g=d[i+1],b=d[i+2];
+      const lum=0.299*r+0.587*g+0.114*b;
+      r=r*0.65+lum*0.35;g=g*0.65+lum*0.35;b=b*0.65+lum*0.35;
+      r=r*1.06+6;g=g*1.06+6;b=b*1.06+6;
+      const cf=0.88;r=r*cf+128*(1-cf);g=g*cf+128*(1-cf);b=b*cf+128*(1-cf);
+      const sR=255*(1-(1-r/255)*(1-tR/255)),sG=255*(1-(1-g/255)*(1-tG/255)),sB=255*(1-(1-b/255)*(1-tB/255));
+      const str=0.20;d[i]=Math.min(255,Math.max(0,r*(1-str)+sR*str));d[i+1]=Math.min(255,Math.max(0,g*(1-str)+sG*str));d[i+2]=Math.min(255,Math.max(0,b*(1-str)+sB*str));
+    }
+    targetCtx.putImageData(id,0,0);
+    const tmp=document.createElement('canvas');tmp.width=w;tmp.height=h;tmp.getContext('2d').drawImage(targetCanvas,0,0);
+    targetCtx.filter='blur(1.2px)';targetCtx.globalAlpha=0.28;targetCtx.drawImage(tmp,0,0);targetCtx.globalAlpha=1;targetCtx.filter='none';
+
+  } else if (filterId === 'winter') {
+    const tR=144,tG=212,tB=200;
+    for (let i=0;i<d.length;i+=4) {
+      let r=d[i],g=d[i+1],b=d[i+2];
+      const cf=1.18;r=(r-128)*cf+128;g=(g-128)*cf+128;b=(b-128)*cf+128;
+      const mR=r*tR/255,mG=g*tG/255,mB=b*tB/255;
+      const sR=255*(1-(1-r/255)*(1-tR/255)),sG=255*(1-(1-g/255)*(1-tG/255)),sB=255*(1-(1-b/255)*(1-tB/255));
+      const str=0.18;const bR=r<128?mR:sR,bG=g<128?mG:sG,bB=b<128?mB:sB;
+      d[i]=Math.min(255,Math.max(0,r*(1-str)+bR*str));d[i+1]=Math.min(255,Math.max(0,g*(1-str)+bG*str));d[i+2]=Math.min(255,Math.max(0,b*(1-str)+bB*str));
+    }
+    targetCtx.putImageData(id,0,0);
+
+  } else if (filterId === 'prague') {
+    for (let i=0;i<d.length;i+=4) {
+      let r=d[i],g=d[i+1],b=d[i+2];
+      const lum=0.299*r+0.587*g+0.114*b,t=lum/255;
+      const warmness=Math.max(0,(r-b)/255),desatAmt=warmness*0.55;
+      r=r*(1-desatAmt)+lum*desatAmt;g=g*(1-desatAmt)+lum*desatAmt;b=b*(1-desatAmt)+lum*desatAmt;
+      r+=(1-t)*2+t*22;g+=(1-t)*(-4)+t*8;b+=(1-t)*18+t*28;
+      r=r*0.93+10;g=g*0.93+9;b=b*0.93+14;
+      const cf=0.91;r=(r-128)*cf+128;g=(g-128)*cf+128;b=(b-128)*cf+128;
+      d[i]=Math.min(255,Math.max(0,r));d[i+1]=Math.min(255,Math.max(0,g));d[i+2]=Math.min(255,Math.max(0,b));
+    }
+    targetCtx.putImageData(id,0,0);
+    const ov=document.createElement('canvas');ov.width=w;ov.height=h;
+    const oCtx=ov.getContext('2d');oCtx.fillStyle='rgba(200,176,216,1)';oCtx.fillRect(0,0,w,h);
+    targetCtx.globalAlpha=0.10;targetCtx.globalCompositeOperation='screen';targetCtx.drawImage(ov,0,0);
+    targetCtx.globalCompositeOperation='source-over';targetCtx.globalAlpha=1;
+
+  } else if (filterId === 'filmgrain') {
+    for (let i=0;i<d.length;i+=4) {
+      let r=d[i],g=d[i+1],b=d[i+2];
+      const lum=0.299*r+0.587*g+0.114*b,t=lum/255;
+      r=r*0.88+14;g=g*0.88+12;b=b*0.88+10;
+      r+=(1-t)*(-4)+t*12;g+=(1-t)*2+t*4;b+=(1-t)*4+t*(-8);
+      const cf=1.06;r=(r-128)*cf+128;g=(g-128)*cf+128;b=(b-128)*cf+128;
+      d[i]=Math.min(255,Math.max(0,r));d[i+1]=Math.min(255,Math.max(0,g));d[i+2]=Math.min(255,Math.max(0,b));
+    }
+    targetCtx.putImageData(id,0,0);
+    const gd=targetCtx.getImageData(0,0,w,h),ga=gd.data;
+    for (let i=0;i<ga.length;i+=4){const n=(Math.random()-0.5)*22,nc=(Math.random()-0.5)*6;ga[i]=Math.min(255,Math.max(0,ga[i]+n+nc));ga[i+1]=Math.min(255,Math.max(0,ga[i+1]+n));ga[i+2]=Math.min(255,Math.max(0,ga[i+2]+n-nc));}
+    targetCtx.putImageData(gd,0,0);
+
+  } else if (filterId === 'y2kdigi') {
+    const cf2=1.05;
+    for (let i=0;i<d.length;i+=4){let r=d[i],g=d[i+1],b=d[i+2];r=(r-128)*cf2+128;g=(g-128)*cf2+128;b=(b-128)*cf2+128;d[i]=Math.min(255,Math.max(0,r));d[i+1]=Math.min(255,Math.max(0,g));d[i+2]=Math.min(255,Math.max(0,b));}
+    targetCtx.putImageData(id,0,0);
+    const gh=document.createElement('canvas');gh.width=w;gh.height=h;gh.getContext('2d').drawImage(targetCanvas,0,0);
+    targetCtx.globalAlpha=0.38;targetCtx.drawImage(gh,2.5,-0.5);targetCtx.globalAlpha=0.10;targetCtx.drawImage(gh,-1.0,0.3);targetCtx.globalAlpha=1;
+    const nd=targetCtx.getImageData(0,0,w,h),na=nd.data;
+    for (let i=0;i<na.length;i+=4){const n=(Math.random()-0.5)*7;na[i]=Math.min(255,Math.max(0,na[i]+n));na[i+1]=Math.min(255,Math.max(0,na[i+1]+n));na[i+2]=Math.min(255,Math.max(0,na[i+2]+n));}
+    targetCtx.putImageData(nd,0,0);
+  }
+}
+
+// Desktop MIX toggle
+document.getElementById('mixToggleBtn').addEventListener('click', () => {
+  if (mixMode) {
+    mixMode = false;
+    mixSelected = [];
+    setMixMode(false);
+    pickFilter('none');
+  } else {
+    setMixMode(true);
+  }
+});
+
+// Desktop apply
+document.getElementById('mixApplyBtn').addEventListener('click', () => {
+  if (mixSelected.length >= 2) renderMix();
+});
+
+// Mobile MIX button — open sheet
+document.getElementById('mixMobileBtn').addEventListener('click', () => {
+  buildMixSheetList();
+  document.getElementById('mixSheetBackdrop').classList.add('open');
+  document.getElementById('mixSheet').classList.add('open');
+});
+document.getElementById('mixSheetBackdrop').addEventListener('click', () => {
+  document.getElementById('mixSheetBackdrop').classList.remove('open');
+  document.getElementById('mixSheet').classList.remove('open');
+});
+
+// Mobile apply
+document.getElementById('mixApplyMobileBtn').addEventListener('click', () => {
+  if (mixSelected.length >= 2) {
+    renderMix();
+    document.getElementById('mixSheetBackdrop').classList.remove('open');
+    document.getElementById('mixSheet').classList.remove('open');
+  }
+});
+
+function buildMixSheetList() {
+  const list = document.getElementById('mixSheetFilterList');
+  list.innerHTML = '';
+  FILTERS.filter(f => f.id !== 'none').forEach(f => {
+    const pill = document.createElement('div');
+    pill.className = 'filter-pill mix-mode' + (mixSelected.includes(f.id) ? ' mix-selected' : '');
+    pill.dataset.id = f.id;
+    const chk = document.createElement('span');
+    chk.className = 'mix-check';
+    chk.textContent = '✓';
+    pill.appendChild(chk);
+    const name = document.createElement('span');
+    name.textContent = f.name;
+    pill.appendChild(name);
+    const tag = document.createElement('span');
+    tag.className = 'pill-tag';
+    tag.textContent = f.tag;
+    pill.appendChild(tag);
+    pill.addEventListener('click', () => {
+      toggleMixFilter(f.id);
+      pill.classList.toggle('mix-selected', mixSelected.includes(f.id));
+      buildMixSheetList();
+    });
+    list.appendChild(pill);
+  });
+  updateMixUI();
+}
+
 // Init mobile on load + resize
 initMobileUI();
 window.addEventListener('resize', () => {
@@ -1348,5 +1849,20 @@ window.addEventListener('resize', () => {
   }
 });
 </script>-e 
+
+<!-- MOBILE MIX SHEET -->
+<div class="mobile-sheet-backdrop" id="mixSheetBackdrop"></div>
+<div class="mobile-sheet" id="mixSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title" style="display:flex;align-items:center;justify-content:space-between">
+    <span>필터 믹스</span>
+    <span style="font-size:11px;color:#6c5ce7;font-weight:400" id="mixCountLabel">최대 4개 선택</span>
+  </div>
+  <div style="font-size:11px;color:#999;margin-bottom:14px">필터를 2~4개 골라서 균등하게 합성해요</div>
+  <div style="display:flex;flex-direction:column;gap:4px" id="mixSheetFilterList"></div>
+  <div id="mixSheetSelectedRow" class="mix-selected-row" style="margin-top:12px"></div>
+  <button class="mix-apply-btn" id="mixApplyMobileBtn" style="margin-top:14px">믹스 적용</button>
+</div>
+
 </body>
 </html>
