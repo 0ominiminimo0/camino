@@ -395,9 +395,8 @@ input[type=range]::-webkit-slider-thumb {
 
   /* 데스크탑 전용 요소 숨기기 */
   .desktop-only { display: none !important; }
-  .sb-section:first-child { display: none; }
+  .sb-section { display: none; }
   .sb-divider { display: none; }
-  .sb-section:not(:first-child) { display: none; }
 
   /* 모바일 전용 영역만 보이게 */
   #mobileFilterSection { display: flex !important; flex-direction: column; }
@@ -683,7 +682,7 @@ const isMobile = () => window.innerWidth <= 640;
 function initMobileUI() {
   if (!isMobile()) return;
   // Show mobile filter section, hide desktop filter list label area
-  document.getElementById('mobileFilterSection').style.display = 'block';
+  document.getElementById('mobileFilterSection').style.display = 'flex';
 
   // Build mobile filter chips
   const mobileList = document.getElementById('mobileFilterList');
@@ -1808,8 +1807,8 @@ if (mixSheetBackdrop) mixSheetBackdrop.addEventListener('click', () => {
 if (mixApplyMobileBtn) mixApplyMobileBtn.addEventListener('click', () => {
   if (mixSelected.length >= 2) {
     renderMix();
-    if (mixSheetBackdrop) mixSheetBackdrop.classList.remove('open');
-    if (mixSheetEl) mixSheetEl.classList.remove('open');
+    document.getElementById('mixSheetBackdrop')?.classList.remove('open');
+    document.getElementById('mixSheet')?.classList.remove('open');
   }
 });
 
@@ -1845,7 +1844,7 @@ function buildMixSheetList() {
 initMobileUI();
 window.addEventListener('resize', () => {
   if (isMobile()) {
-    document.getElementById('mobileFilterSection').style.display = 'block';
+    document.getElementById('mobileFilterSection').style.display = 'flex';
     updateMobileChips(activeFilter);
   } else {
     document.getElementById('mobileFilterSection').style.display = 'none';
