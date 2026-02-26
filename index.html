@@ -1790,23 +1790,26 @@ document.getElementById('mixApplyBtn').addEventListener('click', () => {
   if (mixSelected.length >= 2) renderMix();
 });
 
-// Mobile MIX button — open sheet
-document.getElementById('mixMobileBtn').addEventListener('click', () => {
-  buildMixSheetList();
-  document.getElementById('mixSheetBackdrop').classList.add('open');
-  document.getElementById('mixSheet').classList.add('open');
-});
-document.getElementById('mixSheetBackdrop').addEventListener('click', () => {
-  document.getElementById('mixSheetBackdrop').classList.remove('open');
-  document.getElementById('mixSheet').classList.remove('open');
-});
+// Mobile MIX button — open sheet (safe null checks)
+const mixMobileBtn = document.getElementById('mixMobileBtn');
+const mixSheetBackdrop = document.getElementById('mixSheetBackdrop');
+const mixSheetEl = document.getElementById('mixSheet');
+const mixApplyMobileBtn = document.getElementById('mixApplyMobileBtn');
 
-// Mobile apply
-document.getElementById('mixApplyMobileBtn').addEventListener('click', () => {
+if (mixMobileBtn) mixMobileBtn.addEventListener('click', () => {
+  buildMixSheetList();
+  if (mixSheetBackdrop) mixSheetBackdrop.classList.add('open');
+  if (mixSheetEl) mixSheetEl.classList.add('open');
+});
+if (mixSheetBackdrop) mixSheetBackdrop.addEventListener('click', () => {
+  mixSheetBackdrop.classList.remove('open');
+  if (mixSheetEl) mixSheetEl.classList.remove('open');
+});
+if (mixApplyMobileBtn) mixApplyMobileBtn.addEventListener('click', () => {
   if (mixSelected.length >= 2) {
     renderMix();
-    document.getElementById('mixSheetBackdrop').classList.remove('open');
-    document.getElementById('mixSheet').classList.remove('open');
+    if (mixSheetBackdrop) mixSheetBackdrop.classList.remove('open');
+    if (mixSheetEl) mixSheetEl.classList.remove('open');
   }
 });
 
@@ -1848,7 +1851,7 @@ window.addEventListener('resize', () => {
     document.getElementById('mobileFilterSection').style.display = 'none';
   }
 });
-</script>-e 
+</script>
 
 <!-- MOBILE MIX SHEET -->
 <div class="mobile-sheet-backdrop" id="mixSheetBackdrop"></div>
