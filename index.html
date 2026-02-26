@@ -14,87 +14,73 @@
   --muted: #999;
   --border: #ebebeb;
   --hover: #f7f7f7;
-  --active-bg: #111;
-  --active-text: #fff;
   --tag: #f2f2f2;
   --radius: 6px;
 }
+
+html, body { height: 100%; overflow: hidden; }
 
 body {
   background: var(--bg);
   color: var(--ink);
   font-family: 'Inter', -apple-system, sans-serif;
   font-size: 13px;
-  min-height: 100vh;
 }
 
-/* ── HEADER ── */
+/* ══ HEADER ══ */
 header {
-  height: 52px;
+  height: 48px;
   display: flex;
   align-items: center;
-  padding: 0 32px;
+  padding: 0 20px;
   border-bottom: 1px solid var(--border);
-  gap: 12px;
+  gap: 10px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
 }
 .logo {
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: 600;
   letter-spacing: 3px;
   text-transform: uppercase;
-  color: var(--ink);
 }
-.logo-dot { color: #bbb; margin: 0 4px; }
-.header-sub {
-  font-size: 11px;
-  color: var(--muted);
-  letter-spacing: 0.5px;
-}
+.logo-dot { color: #ccc; margin: 0 3px; }
+.header-sub { font-size: 11px; color: var(--muted); }
 
-/* ── LAYOUT ── */
+/* ══ DESKTOP LAYOUT ══ */
 main {
   display: grid;
-  grid-template-columns: 1fr 268px;
-  height: calc(100vh - 52px);
+  grid-template-columns: 1fr 260px;
+  height: calc(100vh - 48px);
 }
 
-/* ── CANVAS AREA ── */
+/* ── Canvas ── */
 .canvas-area {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px 32px;
-  background: #fff;
+  padding: 20px 28px;
   overflow: hidden;
 }
 
 .drop-zone {
-  width: 100%;
-  height: 100%;
-  max-height: calc(100vh - 52px - 60px);
+  width: 100%; height: 100%;
+  max-height: calc(100vh - 48px - 56px);
   border: 1.5px dashed #ddd;
   border-radius: var(--radius);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  gap: 8px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  cursor: pointer; gap: 8px;
   transition: border-color 0.15s, background 0.15s;
 }
-.drop-zone:hover, .drop-zone.over {
-  border-color: var(--ink);
-  background: var(--hover);
-}
+.drop-zone:hover, .drop-zone.over { border-color: var(--ink); background: var(--hover); }
 .drop-icon {
   width: 36px; height: 36px;
-  border: 1.5px solid #ddd;
-  border-radius: 50%;
+  border: 1.5px solid #ddd; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  font-size: 14px;
-  color: #ccc;
-  margin-bottom: 4px;
+  font-size: 14px; color: #ccc; margin-bottom: 4px;
 }
 .drop-text { font-size: 12px; color: var(--muted); }
 .drop-text em { color: var(--ink); font-style: normal; }
@@ -102,203 +88,247 @@ main {
 #fileInput { display: none; }
 
 .preview-wrap {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  height: 100%;
+  display: none; flex-direction: column;
+  align-items: center; gap: 12px;
+  width: 100%; height: 100%;
 }
 .preview-wrap.on { display: flex; }
 .drop-zone.hidden { display: none; }
 
 canvas {
   max-width: 100%;
-  max-height: calc(100vh - 52px - 100px);
-  width: auto;
-  height: auto;
+  max-height: calc(100vh - 48px - 80px);
+  width: auto; height: auto;
   display: block;
   border-radius: 3px;
   box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+  flex-shrink: 1;
+  min-height: 0;
 }
 
 .actions {
-  display: flex;
-  gap: 8px;
-  flex-shrink: 0;
+  display: flex; gap: 8px; flex-shrink: 0;
 }
 .btn {
-  height: 32px;
-  padding: 0 16px;
-  border: 1px solid var(--border);
-  background: none;
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  font-weight: 400;
-  letter-spacing: 0.3px;
-  color: var(--muted);
-  cursor: pointer;
-  border-radius: var(--radius);
-  transition: all 0.12s;
+  height: 34px; padding: 0 16px;
+  border: 1px solid var(--border); background: none;
+  font-family: 'Inter', sans-serif; font-size: 11px;
+  font-weight: 400; color: var(--muted);
+  cursor: pointer; border-radius: var(--radius);
+  transition: all 0.12s; white-space: nowrap;
 }
 .btn:hover { border-color: #bbb; color: var(--ink); }
-.btn.primary {
-  background: var(--ink);
-  color: #fff;
-  border-color: var(--ink);
-}
+.btn.primary { background: var(--ink); color: #fff; border-color: var(--ink); }
 .btn.primary:hover { background: #333; }
 
-/* ── SIDEBAR ── */
+/* ── Sidebar (desktop) ── */
 .sidebar {
   border-left: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  background: #fff;
+  display: flex; flex-direction: column;
+  overflow-y: auto; background: #fff;
 }
-
-.sb-section {
-  padding: 20px 20px 0;
-}
-.sb-section:last-child { padding-bottom: 20px; }
-
+.sb-section { padding: 16px 16px 0; }
+.sb-section:last-child { padding-bottom: 16px; }
 .sb-label {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 10px;
+  font-size: 10px; font-weight: 500;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 8px;
 }
-
-/* Active filter indicator */
 .active-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  color: var(--ink);
-  font-weight: 400;
+  display: inline-flex; align-items: center;
+  gap: 6px; font-size: 12px; color: var(--ink);
 }
 .active-dot {
-  width: 6px; height: 6px;
-  border-radius: 50%;
-  background: var(--ink);
-  flex-shrink: 0;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--ink); flex-shrink: 0;
 }
-
-/* Filter pills */
-.filter-list {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
+.filter-list { display: flex; flex-direction: column; gap: 2px; }
 .filter-pill {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 34px;
-  padding: 0 12px;
-  border-radius: 5px;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all 0.1s;
-  font-size: 12px;
-  color: var(--ink);
+  display: flex; align-items: center; justify-content: space-between;
+  height: 32px; padding: 0 10px; border-radius: 5px;
+  border: 1px solid transparent; cursor: pointer;
+  transition: all 0.1s; font-size: 12px; color: var(--ink);
 }
 .filter-pill:hover { background: var(--hover); }
-.filter-pill.active {
-  background: var(--ink);
-  color: #fff;
-}
-.pill-tag {
-  font-size: 10px;
-  color: var(--muted);
-  letter-spacing: 0.3px;
-}
-.filter-pill.active .pill-tag { color: rgba(255,255,255,0.45); }
+.filter-pill.active { background: var(--ink); color: #fff; }
+.pill-tag { font-size: 10px; color: var(--muted); }
+.filter-pill.active .pill-tag { color: rgba(255,255,255,0.4); }
 
-/* Divider */
-.sb-divider { height: 1px; background: var(--border); margin: 16px 0 0; }
+.sb-divider { height: 1px; background: var(--border); margin: 12px 0 0; }
 
-/* Adjust toggle button */
 .adjust-toggle {
-  width: 100%;
-  height: 34px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 12px;
-  background: var(--tag);
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  font-family: 'Inter', sans-serif;
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  color: var(--ink);
-  cursor: pointer;
-  transition: all 0.12s;
+  width: 100%; height: 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 10px; background: var(--tag);
+  border: 1px solid var(--border); border-radius: 5px;
+  font-family: 'Inter', sans-serif; font-size: 11px; font-weight: 500;
+  color: var(--ink); cursor: pointer; transition: all 0.12s;
 }
-.adjust-toggle:hover { background: #ebebeb; }
+.adjust-toggle:hover { background: #e8e8e8; }
 .adjust-toggle.open { background: var(--ink); color: #fff; border-color: var(--ink); }
 .toggle-arrow { font-size: 9px; transition: transform 0.2s; }
 .adjust-toggle.open .toggle-arrow { transform: rotate(180deg); }
 
-/* Slider panel */
-.slider-panel {
-  display: none;
-  flex-direction: column;
-  gap: 0;
-  padding-top: 14px;
-}
+.slider-panel { display: none; flex-direction: column; padding-top: 12px; }
 .slider-panel.open { display: flex; }
-
-.slider-group { margin-bottom: 16px; }
+.slider-group { margin-bottom: 14px; }
 .slider-group-label {
-  font-size: 10px;
-  font-weight: 500;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: #bbb;
-  margin-bottom: 10px;
+  font-size: 10px; font-weight: 500; letter-spacing: 1px;
+  text-transform: uppercase; color: #bbb; margin-bottom: 8px;
 }
-
-.sl-row { margin-bottom: 12px; }
+.sl-row { margin-bottom: 10px; }
 .sl-row:last-child { margin-bottom: 0; }
 .sl-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 6px;
-  font-size: 11px;
-  color: var(--muted);
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 5px; font-size: 11px; color: var(--muted);
 }
 .sl-head b { color: var(--ink); font-weight: 400; font-size: 11px; }
 
 input[type=range] {
-  -webkit-appearance: none;
-  width: 100%;
-  height: 2px;
-  background: var(--border);
-  border-radius: 2px;
-  outline: none;
-  cursor: pointer;
+  -webkit-appearance: none; width: 100%; height: 2px;
+  background: var(--border); border-radius: 2px; outline: none; cursor: pointer;
 }
 input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 13px; height: 13px;
-  background: #fff;
-  border: 1.5px solid var(--ink);
-  border-radius: 50%;
-  cursor: pointer;
-  transition: transform 0.1s;
+  -webkit-appearance: none; width: 16px; height: 16px;
+  background: #fff; border: 1.5px solid var(--ink);
+  border-radius: 50%; cursor: pointer;
 }
-input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
-
-/* temp slider gradient track */
 #temp { background: linear-gradient(to right, #a8c8e8, var(--border) 50%, #e8b87a); }
+
+/* ══ MOBILE ══ */
+@media (max-width: 640px) {
+  html, body { overflow: hidden; height: 100%; height: 100dvh; }
+
+  main {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+    height: calc(100dvh - 48px);
+  }
+
+  /* Canvas fills top */
+  .canvas-area {
+    padding: 16px;
+    justify-content: center;
+    overflow: hidden;
+    background: #f9f9f9;
+  }
+
+  .drop-zone {
+    max-height: none;
+    height: 100%;
+    border-radius: 10px;
+  }
+
+  canvas {
+    max-height: 100%;
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+  }
+
+  .preview-wrap {
+    height: 100%;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  /* Actions row on mobile */
+  .actions {
+    gap: 6px;
+  }
+  .btn {
+    height: 36px;
+    font-size: 12px;
+    padding: 0 14px;
+  }
+
+  /* Sidebar becomes bottom panel */
+  .sidebar {
+    border-left: none;
+    border-top: 1px solid var(--border);
+    overflow: visible;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    max-height: 52vh;
+  }
+
+  /* Hide desktop-only elements on mobile */
+  .sb-section:first-child,
+  .sb-divider:first-of-type {
+    display: none;
+  }
+
+  /* Filter strip — horizontal scroll */
+  .filter-section-mobile {
+    padding: 10px 0 0;
+    flex-shrink: 0;
+  }
+  .filter-scroll {
+    display: flex;
+    overflow-x: auto;
+    gap: 6px;
+    padding: 0 14px 10px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .filter-scroll::-webkit-scrollbar { display: none; }
+
+  /* Override desktop filter-list to hide it */
+  .desktop-only { display: none !important; }
+
+  /* Intensity + adjust in compact row */
+  .mobile-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px 10px;
+    flex-shrink: 0;
+  }
+  .mobile-intensity {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .mobile-intensity input { flex: 1; }
+
+  /* Bottom sheet for adjust */
+  .mobile-sheet-backdrop {
+    display: none;
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.2);
+    z-index: 100;
+  }
+  .mobile-sheet-backdrop.open { display: block; }
+  .mobile-sheet {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: #fff;
+    border-radius: 16px 16px 0 0;
+    padding: 0 20px 40px;
+    z-index: 101;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    max-height: 80dvh;
+    overflow-y: auto;
+  }
+  .mobile-sheet.open { transform: translateY(0); }
+  .sheet-handle {
+    width: 36px; height: 4px;
+    background: #ddd; border-radius: 2px;
+    margin: 12px auto 16px;
+  }
+  .sheet-title {
+    font-size: 14px; font-weight: 500;
+    margin-bottom: 20px; color: var(--ink);
+  }
+
+  .adjust-toggle { font-size: 11px; height: 34px; white-space: nowrap; }
+  .sb-section { padding: 10px 14px 0; }
+}
 </style>
 </head>
 <body>
@@ -329,7 +359,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
     </div>
   </div>
 
-  <!-- SIDEBAR -->
+  <!-- SIDEBAR (desktop) -->
   <div class="sidebar">
     <div class="sb-section">
       <div class="sb-label">현재 필터</div>
@@ -341,14 +371,14 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
 
     <div class="sb-divider"></div>
 
-    <div class="sb-section" style="padding-top:16px">
+    <div class="sb-section desktop-only" style="padding-top:14px">
       <div class="sb-label">필터</div>
       <div class="filter-list" id="filterList"></div>
     </div>
 
-    <div class="sb-divider"></div>
+    <div class="sb-divider desktop-only"></div>
 
-    <div class="sb-section" style="padding-top:16px; padding-bottom:16px;">
+    <div class="sb-section" style="padding-top:14px; padding-bottom:14px;">
       <div class="sb-label">필터 강도</div>
       <div class="sl-row" style="margin-bottom:0">
         <div class="sl-head">강도 <b id="intensityVal">100%</b></div>
@@ -358,7 +388,7 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
 
     <div class="sb-divider"></div>
 
-    <div class="sb-section" style="padding-top:16px; padding-bottom:20px;">
+    <div class="sb-section" style="padding-top:14px; padding-bottom:16px;">
       <button class="adjust-toggle" id="adjustBtn">
         세부 조절
         <span class="toggle-arrow">▾</span>
@@ -407,10 +437,173 @@ input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
         </div>
       </div>
     </div>
+
+    <!-- MOBILE: filter chips + intensity + adjust button -->
+    <div class="filter-section-mobile" style="display:none" id="mobileFilterSection">
+      <div class="filter-scroll" id="mobileFilterList"></div>
+      <div class="mobile-controls">
+        <div class="mobile-intensity">
+          <span>강도</span>
+          <input type="range" id="intensityMobile" min="0" max="100" value="100">
+          <b id="intensityValMobile" style="min-width:28px;text-align:right;color:#111">100%</b>
+        </div>
+        <button class="adjust-toggle" id="adjustBtnMobile" style="width:auto;padding:0 12px;flex-shrink:0">
+          조절 <span class="toggle-arrow" id="mobileArrow">▾</span>
+        </button>
+      </div>
+    </div>
   </div>
 </main>
 
+<!-- MOBILE BOTTOM SHEET -->
+<div class="mobile-sheet-backdrop" id="sheetBackdrop"></div>
+<div class="mobile-sheet" id="mobileSheet">
+  <div class="sheet-handle"></div>
+  <div class="sheet-title">세부 조절</div>
+  <div class="slider-group">
+    <div class="slider-group-label">밝기 · 색상</div>
+    <div class="sl-row">
+      <div class="sl-head">밝기 <b id="bValM">0</b></div>
+      <input type="range" id="brightnessM" min="-100" max="100" value="0">
+    </div>
+    <div class="sl-row">
+      <div class="sl-head">대비 <b id="cValM">0</b></div>
+      <input type="range" id="contrastM" min="-100" max="100" value="0">
+    </div>
+    <div class="sl-row">
+      <div class="sl-head">채도 <b id="sValM">0</b></div>
+      <input type="range" id="saturationM" min="-100" max="100" value="0">
+    </div>
+    <div class="sl-row">
+      <div class="sl-head">노출 <b id="eValM">0</b></div>
+      <input type="range" id="exposureM" min="-100" max="100" value="0">
+    </div>
+  </div>
+  <div class="slider-group">
+    <div class="slider-group-label">포커스</div>
+    <div class="sl-row">
+      <div class="sl-head">블러 <b id="blValM">0</b></div>
+      <input type="range" id="blurM" min="0" max="20" value="0">
+    </div>
+    <div class="sl-row">
+      <div class="sl-head">선명도 <b id="shValM">0</b></div>
+      <input type="range" id="sharpenM" min="0" max="100" value="0">
+    </div>
+  </div>
+  <div class="slider-group" style="margin-bottom:0">
+    <div class="slider-group-label">색온도</div>
+    <div class="sl-row" style="margin-bottom:0">
+      <div class="sl-head">
+        <span style="color:#7ab4d8;font-size:10px">차가움</span>
+        <b id="tempValM">0</b>
+        <span style="color:#d4895a;font-size:10px">따뜻함</span>
+      </div>
+      <input type="range" id="tempM" min="-100" max="100" value="0" style="background: linear-gradient(to right, #a8c8e8, #ebebeb 50%, #e8b87a)">
+    </div>
+  </div>
+</div>
+
 <script>
+// ── MOBILE DETECTION & INIT ──
+const isMobile = () => window.innerWidth <= 640;
+
+function initMobileUI() {
+  if (!isMobile()) return;
+  // Show mobile filter section, hide desktop filter list label area
+  document.getElementById('mobileFilterSection').style.display = 'block';
+
+  // Build mobile filter chips
+  const mobileList = document.getElementById('mobileFilterList');
+  FILTERS.forEach(f => {
+    const chip = document.createElement('div');
+    chip.dataset.id = f.id;
+    chip.style.cssText = `
+      flex-shrink:0; height:32px; padding:0 12px;
+      border-radius:20px; border:1px solid #e0e0e0;
+      display:flex; align-items:center; gap:5px;
+      font-size:12px; cursor:pointer; white-space:nowrap;
+      transition:all 0.1s; background:#fff; color:#111;
+    `;
+    chip.innerHTML = `<span>${f.name}</span>`;
+    if (f.id === 'none') {
+      chip.style.background = '#111';
+      chip.style.color = '#fff';
+      chip.style.borderColor = '#111';
+    }
+    chip.addEventListener('click', () => pickFilter(f.id));
+    mobileList.appendChild(chip);
+  });
+}
+
+function updateMobileChips(activeId) {
+  document.querySelectorAll('#mobileFilterList [data-id]').forEach(chip => {
+    const isActive = chip.dataset.id === activeId;
+    chip.style.background = isActive ? '#111' : '#fff';
+    chip.style.color = isActive ? '#fff' : '#111';
+    chip.style.borderColor = isActive ? '#111' : '#e0e0e0';
+  });
+  // Scroll active chip into view
+  const active = document.querySelector(`#mobileFilterList [data-id="${activeId}"]`);
+  if (active) active.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' });
+}
+
+// Mobile bottom sheet
+function openSheet() {
+  document.getElementById('sheetBackdrop').classList.add('open');
+  document.getElementById('mobileSheet').classList.add('open');
+  document.getElementById('mobileArrow').style.transform = 'rotate(180deg)';
+}
+function closeSheet() {
+  document.getElementById('sheetBackdrop').classList.remove('open');
+  document.getElementById('mobileSheet').classList.remove('open');
+  document.getElementById('mobileArrow').style.transform = '';
+}
+
+document.getElementById('adjustBtnMobile').addEventListener('click', () => {
+  const sheet = document.getElementById('mobileSheet');
+  sheet.classList.contains('open') ? closeSheet() : openSheet();
+});
+document.getElementById('sheetBackdrop').addEventListener('click', closeSheet);
+
+// Mobile intensity slider (mirrors desktop)
+document.getElementById('intensityMobile').addEventListener('input', function() {
+  document.getElementById('intensityValMobile').textContent = this.value + '%';
+  document.getElementById('intensity').value = this.value;
+  document.getElementById('intensityVal').textContent = this.value + '%';
+  render();
+});
+
+// Mobile sheet sliders — each mirrors desktop slider
+const mobileSliderMap = {
+  brightnessM: ['brightness','bVal','bValM'],
+  contrastM:   ['contrast','cVal','cValM'],
+  saturationM: ['saturation','sVal','sValM'],
+  exposureM:   ['exposure','eVal','eValM'],
+  blurM:       ['blur','blVal','blValM'],
+  sharpenM:    ['sharpen','shVal','shValM'],
+  tempM:       ['temp','tempVal','tempValM'],
+};
+Object.entries(mobileSliderMap).forEach(([mId, [dId, dVal, mVal]]) => {
+  document.getElementById(mId).addEventListener('input', function() {
+    document.getElementById(mVal).textContent = this.value;
+    document.getElementById(dId).value = this.value;
+    document.getElementById(dVal).textContent = this.value;
+    render();
+  });
+});
+
+function syncMobileSliders() {
+  // Sync mobile sheet sliders to match desktop values
+  Object.entries(mobileSliderMap).forEach(([mId, [dId, , mVal]]) => {
+    const val = document.getElementById(dId).value;
+    document.getElementById(mId).value = val;
+    document.getElementById(mVal).textContent = val;
+  });
+  const intVal = document.getElementById('intensity').value;
+  document.getElementById('intensityMobile').value = intVal;
+  document.getElementById('intensityValMobile').textContent = intVal + '%';
+}
+
 const FILTERS = [
   { id: 'none',      name: '원본',          tag: 'base',  css: '' },
   { id: 'rosemilk',  name: 'Rose Milk',     tag: 'warm',  css: '__pixel__' },
@@ -469,6 +662,7 @@ function resetSliders() {
   });
   document.getElementById('intensity').value = 100;
   document.getElementById('intensityVal').textContent = '100%';
+  syncMobileSliders();
 }
 
 const sliderMap = { brightness:'bVal', contrast:'cVal', saturation:'sVal', exposure:'eVal', blur:'blVal', sharpen:'shVal', temp:'tempVal' };
@@ -489,6 +683,7 @@ function pickFilter(id) {
   document.querySelectorAll('.filter-pill').forEach(p => p.classList.toggle('active', p.dataset.id === id));
   document.getElementById('activeName').textContent = FILTERS.find(f => f.id === id).name;
   resetSliders();
+  if (isMobile()) updateMobileChips(id);
   render();
 }
 
@@ -759,6 +954,17 @@ document.getElementById('dlBtn').addEventListener('click', () => {
   a.href = tmp.toDataURL('image/png');
   a.click();
 });
-</script>
+
+// Init mobile on load + resize
+initMobileUI();
+window.addEventListener('resize', () => {
+  if (isMobile()) {
+    document.getElementById('mobileFilterSection').style.display = 'block';
+    updateMobileChips(activeFilter);
+  } else {
+    document.getElementById('mobileFilterSection').style.display = 'none';
+  }
+});
+</script>-e 
 </body>
 </html>
