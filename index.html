@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Camino</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #ffffff;
+  --ink: #111111;
+  --muted: #999;
+  --border: #ebebeb;
+  --hover: #f7f7f7;
+  --active-bg: #111;
+  --active-text: #fff;
+  --tag: #f2f2f2;
+  --radius: 6px;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 13px;
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+header {
+  height: 52px;
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+.logo {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.logo-dot { color: #bbb; margin: 0 4px; }
+.header-sub {
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+}
+
+/* ── LAYOUT ── */
+main {
+  display: grid;
+  grid-template-columns: 1fr 268px;
+  height: calc(100vh - 52px);
+}
+
+/* ── CANVAS AREA ── */
+.canvas-area {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 32px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.drop-zone {
+  width: 100%;
+  height: 100%;
+  max-height: calc(100vh - 52px - 60px);
+  border: 1.5px dashed #ddd;
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  gap: 8px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.drop-zone:hover, .drop-zone.over {
+  border-color: var(--ink);
+  background: var(--hover);
+}
+.drop-icon {
+  width: 36px; height: 36px;
+  border: 1.5px solid #ddd;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  color: #ccc;
+  margin-bottom: 4px;
+}
+.drop-text { font-size: 12px; color: var(--muted); }
+.drop-text em { color: var(--ink); font-style: normal; }
+.drop-hint { font-size: 10px; color: #ccc; letter-spacing: 0.5px; }
+#fileInput { display: none; }
+
+.preview-wrap {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  height: 100%;
+}
+.preview-wrap.on { display: flex; }
+.drop-zone.hidden { display: none; }
+
+canvas {
+  max-width: 100%;
+  max-height: calc(100vh - 52px - 100px);
+  width: auto;
+  height: auto;
+  display: block;
+  border-radius: 3px;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.08);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.btn {
+  height: 32px;
+  padding: 0 16px;
+  border: 1px solid var(--border);
+  background: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: all 0.12s;
+}
+.btn:hover { border-color: #bbb; color: var(--ink); }
+.btn.primary {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+.btn.primary:hover { background: #333; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background: #fff;
+}
+
+.sb-section {
+  padding: 20px 20px 0;
+}
+.sb-section:last-child { padding-bottom: 20px; }
+
+.sb-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+/* Active filter indicator */
+.active-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ink);
+  font-weight: 400;
+}
+.active-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--ink);
+  flex-shrink: 0;
+}
+
+/* Filter pills */
+.filter-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.filter-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 5px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.1s;
+  font-size: 12px;
+  color: var(--ink);
+}
+.filter-pill:hover { background: var(--hover); }
+.filter-pill.active {
+  background: var(--ink);
+  color: #fff;
+}
+.pill-tag {
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 0.3px;
+}
+.filter-pill.active .pill-tag { color: rgba(255,255,255,0.45); }
+
+/* Divider */
+.sb-divider { height: 1px; background: var(--border); margin: 16px 0 0; }
+
+/* Adjust toggle button */
+.adjust-toggle {
+  width: 100%;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  background: var(--tag);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  color: var(--ink);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.adjust-toggle:hover { background: #ebebeb; }
+.adjust-toggle.open { background: var(--ink); color: #fff; border-color: var(--ink); }
+.toggle-arrow { font-size: 9px; transition: transform 0.2s; }
+.adjust-toggle.open .toggle-arrow { transform: rotate(180deg); }
+
+/* Slider panel */
+.slider-panel {
+  display: none;
+  flex-direction: column;
+  gap: 0;
+  padding-top: 14px;
+}
+.slider-panel.open { display: flex; }
+
+.slider-group { margin-bottom: 16px; }
+.slider-group-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #bbb;
+  margin-bottom: 10px;
+}
+
+.sl-row { margin-bottom: 12px; }
+.sl-row:last-child { margin-bottom: 0; }
+.sl-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.sl-head b { color: var(--ink); font-weight: 400; font-size: 11px; }
+
+input[type=range] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 2px;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 13px; height: 13px;
+  background: #fff;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.25); }
+
+/* temp slider gradient track */
+#temp { background: linear-gradient(to right, #a8c8e8, var(--border) 50%, #e8b87a); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Camino</div>
+  <div class="logo-dot">·</div>
+  <div class="header-sub">Photo Filter Studio</div>
+</header>
+
+<main>
+  <!-- CANVAS -->
+  <div class="canvas-area">
+    <div class="drop-zone" id="dropZone">
+      <div class="drop-icon">↑</div>
+      <div class="drop-text">드래그하거나 <em>클릭</em>해서 업로드</div>
+      <div class="drop-hint">JPG · PNG · WEBP</div>
+      <input type="file" id="fileInput" accept="image/*">
+    </div>
+
+    <div class="preview-wrap" id="previewWrap">
+      <canvas id="canvas"></canvas>
+      <div class="actions">
+        <button class="btn" id="resetBtn">초기화</button>
+        <button class="btn" id="changeBtn">사진 변경</button>
+        <button class="btn primary" id="dlBtn">↓ 저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-section">
+      <div class="sb-label">현재 필터</div>
+      <div class="active-tag">
+        <div class="active-dot"></div>
+        <span id="activeName">없음</span>
+      </div>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <div class="sb-section" style="padding-top:16px">
+      <div class="sb-label">필터</div>
+      <div class="filter-list" id="filterList"></div>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <div class="sb-section" style="padding-top:16px; padding-bottom:16px;">
+      <div class="sb-label">필터 강도</div>
+      <div class="sl-row" style="margin-bottom:0">
+        <div class="sl-head">강도 <b id="intensityVal">100%</b></div>
+        <input type="range" id="intensity" min="0" max="100" value="100">
+      </div>
+    </div>
+
+    <div class="sb-divider"></div>
+
+    <div class="sb-section" style="padding-top:16px; padding-bottom:20px;">
+      <button class="adjust-toggle" id="adjustBtn">
+        세부 조절
+        <span class="toggle-arrow">▾</span>
+      </button>
+      <div class="slider-panel" id="sliderPanel">
+        <div class="slider-group">
+          <div class="slider-group-label">밝기 · 색상</div>
+          <div class="sl-row">
+            <div class="sl-head">밝기 <b id="bVal">0</b></div>
+            <input type="range" id="brightness" min="-100" max="100" value="0">
+          </div>
+          <div class="sl-row">
+            <div class="sl-head">대비 <b id="cVal">0</b></div>
+            <input type="range" id="contrast" min="-100" max="100" value="0">
+          </div>
+          <div class="sl-row">
+            <div class="sl-head">채도 <b id="sVal">0</b></div>
+            <input type="range" id="saturation" min="-100" max="100" value="0">
+          </div>
+          <div class="sl-row">
+            <div class="sl-head">노출 <b id="eVal">0</b></div>
+            <input type="range" id="exposure" min="-100" max="100" value="0">
+          </div>
+        </div>
+        <div class="slider-group">
+          <div class="slider-group-label">포커스</div>
+          <div class="sl-row">
+            <div class="sl-head">블러 <b id="blVal">0</b></div>
+            <input type="range" id="blur" min="0" max="20" value="0">
+          </div>
+          <div class="sl-row">
+            <div class="sl-head">선명도 <b id="shVal">0</b></div>
+            <input type="range" id="sharpen" min="0" max="100" value="0">
+          </div>
+        </div>
+        <div class="slider-group" style="margin-bottom:0">
+          <div class="slider-group-label">색온도</div>
+          <div class="sl-row" style="margin-bottom:0">
+            <div class="sl-head">
+              <span style="color:#7ab4d8; font-size:10px">차가움</span>
+              <b id="tempVal">0</b>
+              <span style="color:#d4895a; font-size:10px">따뜻함</span>
+            </div>
+            <input type="range" id="temp" min="-100" max="100" value="0">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+const FILTERS = [
+  { id: 'none',      name: '원본',          tag: 'base',  css: '' },
+  { id: 'rosemilk',  name: 'Rose Milk',     tag: 'warm',  css: '__pixel__' },
+  { id: 'sunshine',  name: 'Sunshine',      tag: 'warm',  css: '__pixel__' },
+  { id: 'kodak',     name: 'Kodak Gold',    tag: 'film',  css: 'sepia(0.25) saturate(1.4) brightness(1.05) contrast(1.08) hue-rotate(-5deg)' },
+  { id: 'fuji',      name: 'Fuji Pro',      tag: 'film',  css: 'saturate(1.3) hue-rotate(5deg) brightness(1.02) contrast(0.95)' },
+  { id: 'portra',    name: 'Portra 400',    tag: 'film',  css: 'sepia(0.1) saturate(0.9) brightness(1.1) contrast(0.92) hue-rotate(-8deg)' },
+  { id: 'fujitra',   name: 'Fuji × Portra', tag: 'film',  css: 'saturate(1.1) hue-rotate(-1deg) brightness(1.06) contrast(0.935) sepia(0.05)' },
+  { id: 'ilford',    name: 'Ilford HP5',    tag: 'b&w',   css: 'grayscale(1) contrast(1.15) brightness(1.02)' },
+  { id: 'trix',      name: 'Tri-X 400',     tag: 'b&w',   css: 'grayscale(1) contrast(1.35) brightness(0.95)' },
+  { id: 'cross',     name: 'Cross Process', tag: 'lomo',  css: 'saturate(1.35) hue-rotate(30deg) contrast(0.97) brightness(1.20)' },
+  { id: 'fade',      name: 'Faded',         tag: 'mood',  css: 'contrast(0.85) brightness(1.08) saturate(0.7)' },
+  { id: 'y2kdigi',   name: 'Y2K Digi',      tag: '2000s', css: '__pixel__' },
+];
+
+const PIXEL_FILTERS = ['rosemilk', 'sunshine', 'y2kdigi'];
+let activeFilter = 'none';
+let originalImg = null;
+
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const previewWrap = document.getElementById('previewWrap');
+const filterList = document.getElementById('filterList');
+
+// Build filter list
+FILTERS.forEach(f => {
+  const el = document.createElement('div');
+  el.className = 'filter-pill' + (f.id === 'none' ? ' active' : '');
+  el.dataset.id = f.id;
+  el.innerHTML = `<span>${f.name}</span><span class="pill-tag">${f.tag}</span>`;
+  el.addEventListener('click', () => pickFilter(f.id));
+  filterList.appendChild(el);
+});
+
+// ── SLIDERS ──
+function getSliders() {
+  return {
+    b:         parseFloat(document.getElementById('brightness').value),
+    c:         parseFloat(document.getElementById('contrast').value),
+    s:         parseFloat(document.getElementById('saturation').value),
+    e:         parseFloat(document.getElementById('exposure').value),
+    bl:        parseFloat(document.getElementById('blur').value),
+    sh:        parseFloat(document.getElementById('sharpen').value),
+    temp:      parseFloat(document.getElementById('temp').value),
+    intensity: parseFloat(document.getElementById('intensity').value) / 100,
+  };
+}
+
+function resetSliders() {
+  const map = { brightness:'bVal', contrast:'cVal', saturation:'sVal', exposure:'eVal', blur:'blVal', sharpen:'shVal', temp:'tempVal' };
+  Object.keys(map).forEach(id => {
+    document.getElementById(id).value = 0;
+    document.getElementById(map[id]).textContent = '0';
+  });
+  document.getElementById('intensity').value = 100;
+  document.getElementById('intensityVal').textContent = '100%';
+}
+
+const sliderMap = { brightness:'bVal', contrast:'cVal', saturation:'sVal', exposure:'eVal', blur:'blVal', sharpen:'shVal', temp:'tempVal' };
+Object.keys(sliderMap).forEach(id => {
+  document.getElementById(id).addEventListener('input', function() {
+    document.getElementById(sliderMap[id]).textContent = this.value;
+    render();
+  });
+});
+document.getElementById('intensity').addEventListener('input', function() {
+  document.getElementById('intensityVal').textContent = this.value + '%';
+  render();
+});
+
+// ── FILTER PICK ──
+function pickFilter(id) {
+  activeFilter = id;
+  document.querySelectorAll('.filter-pill').forEach(p => p.classList.toggle('active', p.dataset.id === id));
+  document.getElementById('activeName').textContent = FILTERS.find(f => f.id === id).name;
+  resetSliders();
+  render();
+}
+
+// ── ADJUST PANEL ──
+document.getElementById('adjustBtn').addEventListener('click', () => {
+  document.getElementById('adjustBtn').classList.toggle('open');
+  document.getElementById('sliderPanel').classList.toggle('open');
+});
+
+// ── FILE LOAD ──
+dropZone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', e => loadFile(e.target.files[0]));
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('over'); loadFile(e.dataTransfer.files[0]); });
+
+function loadFile(file) {
+  if (!file?.type.startsWith('image/')) return;
+  const url = URL.createObjectURL(file);
+  const img = new Image();
+  img.onload = () => {
+    let w = img.naturalWidth, h = img.naturalHeight;
+    const MAX = 1600;
+    if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+    if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
+    canvas.width = w; canvas.height = h;
+    ctx.drawImage(img, 0, 0, w, h);
+    originalImg = img;
+    originalImg._w = w; originalImg._h = h;
+    dropZone.classList.add('hidden');
+    previewWrap.classList.add('on');
+    render();
+  };
+  img.src = url;
+}
+
+// ── CSS BUILDER ──
+function buildSliderCSS(sliders) {
+  const { b, c, s, e, bl, sh, temp } = sliders;
+  let css = '';
+  css += `brightness(${1 + (b + e * 0.5) / 100}) `;
+  css += `contrast(${1 + c / 100}) `;
+  css += `saturate(${1 + s / 100}) `;
+  if (temp > 0) { const t = temp/100; css += `sepia(${t*0.18}) hue-rotate(${-t*12}deg) `; }
+  else if (temp < 0) { const t = Math.abs(temp)/100; css += `hue-rotate(${t*15}deg) saturate(${1 - t*0.12}) `; }
+  if (bl > 0) css += `blur(${bl}px) `;
+  if (sh > 0) css += `saturate(${1 + sh*0.003}) contrast(${1 + sh*0.004}) `;
+  return css.trim();
+}
+
+// Lerp a CSS filter string toward neutral (no filter) based on intensity 0-1
+// Parses each function and scales deviation from 1 (for multiplicative) or 0 (for additive)
+function scaleFilterCSS(cssStr, intensity) {
+  if (intensity >= 1 || !cssStr) return cssStr;
+  return cssStr.replace(/([\w-]+)\(([^)]+)\)/g, (match, fn, val) => {
+    const num = parseFloat(val);
+    const unit = val.replace(/[\d.\-]/g, '').trim();
+    // Additive-from-zero: hue-rotate, sepia, grayscale, blur
+    const additiveFromZero = ['hue-rotate','sepia','grayscale','blur'];
+    // Multiplicative-from-1: brightness, contrast, saturate
+    if (additiveFromZero.includes(fn)) {
+      return `${fn}(${num * intensity}${unit})`;
+    } else {
+      // lerp from 1 toward actual value
+      const scaled = 1 + (num - 1) * intensity;
+      return `${fn}(${scaled}${unit})`;
+    }
+  });
+}
+
+function getFullCSS() {
+  const f = FILTERS.find(f => f.id === activeFilter);
+  const sliders = getSliders();
+  const { intensity } = sliders;
+  const rawBase = (f.css && f.css !== '__pixel__') ? f.css : '';
+  const scaledBase = scaleFilterCSS(rawBase, intensity);
+  const base = scaledBase ? scaledBase + ' ' : '';
+  return (base + buildSliderCSS(sliders)).trim();
+}
+
+// ── PIXEL FILTERS ──
+function applyRoseMilk(imgEl, w, h) {
+  ctx.clearRect(0, 0, w, h);
+  ctx.filter = 'none';
+  ctx.drawImage(imgEl, 0, 0, w, h);
+  const id = ctx.getImageData(0, 0, w, h);
+  const d = id.data;
+  const tR = 255, tG = 184, tB = 198;
+  for (let i = 0; i < d.length; i += 4) {
+    let r = d[i]*1.06, g = d[i+1]*1.06, b = d[i+2]*1.06;
+    r = r*0.93 + 128*0.07; g = g*0.93 + 128*0.07; b = b*0.93 + 128*0.07;
+    const sR = 255*(1-(1-r/255)*(1-tR/255));
+    const sG = 255*(1-(1-g/255)*(1-tG/255));
+    const sB = 255*(1-(1-b/255)*(1-tB/255));
+    d[i]   = Math.min(255,Math.max(0, r*0.87 + sR*0.13));
+    d[i+1] = Math.min(255,Math.max(0, g*0.87 + sG*0.13));
+    d[i+2] = Math.min(255,Math.max(0, b*0.87 + sB*0.13));
+  }
+  ctx.putImageData(id, 0, 0);
+  const tmp = document.createElement('canvas');
+  tmp.width = w; tmp.height = h;
+  tmp.getContext('2d').drawImage(canvas, 0, 0);
+  ctx.filter = 'blur(0.8px)';
+  ctx.globalAlpha = 0.35;
+  ctx.drawImage(tmp, 0, 0);
+  ctx.globalAlpha = 1; ctx.filter = 'none';
+}
+
+function applySunshine(imgEl, w, h) {
+  ctx.clearRect(0, 0, w, h);
+  ctx.filter = 'none';
+  ctx.drawImage(imgEl, 0, 0, w, h);
+  const id = ctx.getImageData(0, 0, w, h);
+  const d = id.data;
+  // Tint: lemon-beige #fff0c0 (r=255, g=240, b=192) — warm golden light
+  const tR = 255, tG = 240, tB = 192;
+  for (let i = 0; i < d.length; i += 4) {
+    let r = d[i], g = d[i+1], b = d[i+2];
+
+    // 1. Brighten + lift shadows (airy, sun-flooded look)
+    r = r * 1.10 + 8;
+    g = g * 1.08 + 5;
+    b = b * 1.04 + 2;
+
+    // 2. Reduce contrast softly for that hazy feeling
+    const cf = 0.91;
+    r = r * cf + 128 * (1 - cf);
+    g = g * cf + 128 * (1 - cf);
+    b = b * cf + 128 * (1 - cf);
+
+    // 3. Screen blend with lemon-beige — adds warmth without yellowing
+    const sR = 255*(1-(1-r/255)*(1-tR/255));
+    const sG = 255*(1-(1-g/255)*(1-tG/255));
+    const sB = 255*(1-(1-b/255)*(1-tB/255));
+
+    // 4. Blend at low strength — just a kiss of golden light
+    const str = 0.16;
+    r = r*(1-str) + sR*str;
+    g = g*(1-str) + sG*str;
+    b = b*(1-str) + sB*str;
+
+    d[i]   = Math.min(255, Math.max(0, r));
+    d[i+1] = Math.min(255, Math.max(0, g));
+    d[i+2] = Math.min(255, Math.max(0, b));
+  }
+  ctx.putImageData(id, 0, 0);
+
+  // Glowy softness — two layered passes, slight haze
+  const tmp = document.createElement('canvas');
+  tmp.width = w; tmp.height = h;
+  tmp.getContext('2d').drawImage(canvas, 0, 0);
+
+  // First pass: wide soft glow (simulates lens flare haze)
+  ctx.filter = 'blur(2.5px)';
+  ctx.globalAlpha = 0.22;
+  ctx.drawImage(tmp, 0, 0);
+
+  // Second pass: tighter warmth bloom
+  ctx.filter = 'blur(0.8px) brightness(1.04)';
+  ctx.globalAlpha = 0.18;
+  ctx.drawImage(tmp, 0, 0);
+
+  ctx.globalAlpha = 1; ctx.filter = 'none';
+}
+
+function applyY2KDigi(imgEl, w, h) {
+  ctx.clearRect(0, 0, w, h);
+  ctx.filter = 'none';
+  ctx.drawImage(imgEl, 0, 0, w, h);
+  const id = ctx.getImageData(0, 0, w, h);
+  const d = id.data;
+  for (let i = 0; i < d.length; i += 4) {
+    let r = d[i], g = d[i+1], b = d[i+2];
+    r = (r-128)*1.05+128; g = (g-128)*1.05+128; b = (b-128)*1.05+128;
+    d[i]   = Math.min(255,Math.max(0,r));
+    d[i+1] = Math.min(255,Math.max(0,g));
+    d[i+2] = Math.min(255,Math.max(0,b));
+  }
+  ctx.putImageData(id, 0, 0);
+  const ghost = document.createElement('canvas');
+  ghost.width = w; ghost.height = h;
+  ghost.getContext('2d').drawImage(canvas, 0, 0);
+  ctx.globalAlpha = 0.38; ctx.drawImage(ghost, 2.5, -0.5);
+  ctx.globalAlpha = 0.10; ctx.drawImage(ghost, -1.0, 0.3);
+  ctx.globalAlpha = 1; ctx.filter = 'none';
+  const nd = ctx.getImageData(0, 0, w, h); const na = nd.data;
+  for (let i = 0; i < na.length; i += 4) {
+    const n = (Math.random()-0.5)*7;
+    na[i]   = Math.min(255,Math.max(0,na[i]+n));
+    na[i+1] = Math.min(255,Math.max(0,na[i+1]+n));
+    na[i+2] = Math.min(255,Math.max(0,na[i+2]+n));
+  }
+  ctx.putImageData(nd, 0, 0);
+}
+
+// ── RENDER ──
+function render() {
+  if (!originalImg) return;
+  const w = originalImg._w, h = originalImg._h;
+  const sliders = getSliders();
+  const { intensity } = sliders;
+
+  if (PIXEL_FILTERS.includes(activeFilter)) {
+    if (intensity >= 1) {
+      // Full strength — direct
+      if (activeFilter === 'rosemilk') applyRoseMilk(originalImg, w, h);
+      if (activeFilter === 'sunshine') applySunshine(originalImg, w, h);
+      if (activeFilter === 'y2kdigi')  applyY2KDigi(originalImg, w, h);
+    } else {
+      // Partial: run filter fully → save → blend with original at intensity
+      const orig = document.createElement('canvas');
+      orig.width = w; orig.height = h;
+      orig.getContext('2d').drawImage(originalImg, 0, 0, w, h);
+
+      if (activeFilter === 'rosemilk') applyRoseMilk(originalImg, w, h);
+      if (activeFilter === 'sunshine') applySunshine(originalImg, w, h);
+      if (activeFilter === 'y2kdigi')  applyY2KDigi(originalImg, w, h);
+
+      const filtered = document.createElement('canvas');
+      filtered.width = w; filtered.height = h;
+      filtered.getContext('2d').drawImage(canvas, 0, 0);
+
+      ctx.clearRect(0, 0, w, h);
+      ctx.filter = 'none';
+      ctx.globalAlpha = 1;
+      ctx.drawImage(orig, 0, 0);
+      ctx.globalAlpha = intensity;
+      ctx.drawImage(filtered, 0, 0);
+      ctx.globalAlpha = 1;
+    }
+    canvas.style.filter = buildSliderCSS(sliders);
+  } else {
+    ctx.clearRect(0, 0, w, h);
+    ctx.filter = 'none';
+    ctx.drawImage(originalImg, 0, 0, w, h);
+    canvas.style.filter = getFullCSS();
+  }
+}
+// ── BUTTONS ──
+document.getElementById('resetBtn').addEventListener('click', () => pickFilter('none'));
+
+document.getElementById('changeBtn').addEventListener('click', () => {
+  previewWrap.classList.remove('on');
+  dropZone.classList.remove('hidden');
+  fileInput.value = '';
+  originalImg = null;
+  canvas.style.filter = '';
+});
+
+document.getElementById('dlBtn').addEventListener('click', () => {
+  if (!originalImg) return;
+  const w = canvas.width, h = canvas.height;
+  const sliders = getSliders();
+  const tmp = document.createElement('canvas');
+  tmp.width = w; tmp.height = h;
+  const tCtx = tmp.getContext('2d');
+
+  if (PIXEL_FILTERS.includes(activeFilter)) {
+    tCtx.filter = buildSliderCSS(sliders);
+    tCtx.drawImage(canvas, 0, 0);
+  } else {
+    tCtx.filter = getFullCSS();
+    tCtx.drawImage(originalImg, 0, 0, w, h);
+  }
+
+  const a = document.createElement('a');
+  a.download = `camino-${activeFilter}.png`;
+  a.href = tmp.toDataURL('image/png');
+  a.click();
+});
+</script>
+</body>
+</html>
