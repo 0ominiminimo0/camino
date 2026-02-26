@@ -197,69 +197,96 @@ input[type=range]::-webkit-slider-thumb {
 
 /* ══ MOBILE ══ */
 @media (max-width: 640px) {
-  html, body { overflow: hidden; height: 100%; height: 100dvh; }
+  /* 하단 패널 높이 변수 — 필터칩 + 강도슬라이더 + safe area */
+  :root { --bottom-panel: 130px; }
+
+  html, body {
+    height: 100dvh;
+    overflow: hidden;
+  }
 
   main {
-    grid-template-columns: 1fr;
-    grid-template-rows: 1fr auto;
+    display: flex;
+    flex-direction: column;
+    grid-template-columns: unset;
     height: calc(100dvh - 48px);
   }
 
-  /* Canvas fills top */
+  /* ① 사진 영역 — 하단 패널 빼고 남은 공간 전부 */
   .canvas-area {
-    padding: 16px;
+    flex: 1;
+    min-height: 0;          /* flex child가 줄어들 수 있게 */
+    padding: 12px 12px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
     overflow: hidden;
-    background: #f9f9f9;
+    background: #f6f6f6;
   }
 
   .drop-zone {
+    width: 100%;
+    flex: 1;
+    min-height: 0;
     max-height: none;
-    height: 100%;
-    border-radius: 10px;
+    border-radius: 12px;
+    border: 1.5px dashed #d0d0d0;
   }
 
   canvas {
-    max-height: 100%;
     max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
     border-radius: 8px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.10);
+    flex-shrink: 1;
+    object-fit: contain;
   }
 
   .preview-wrap {
-    height: 100%;
-    gap: 10px;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    display: none;
+    flex-direction: column;
+    align-items: center;
     justify-content: center;
+    gap: 8px;
+    overflow: hidden;
   }
+  .preview-wrap.on { display: flex; }
 
-  /* Actions row on mobile */
   .actions {
+    flex-shrink: 0;
     gap: 6px;
   }
-  .btn {
-    height: 36px;
-    font-size: 12px;
-    padding: 0 14px;
-  }
+  .btn { height: 34px; font-size: 12px; padding: 0 14px; }
 
-  /* Sidebar becomes bottom panel */
+  /* ② 하단 패널 — 고정 높이 */
   .sidebar {
+    flex-shrink: 0;
+    height: var(--bottom-panel);
     border-left: none;
     border-top: 1px solid var(--border);
     overflow: visible;
-    background: #fff;
     display: flex;
     flex-direction: column;
-    max-height: 52vh;
+    justify-content: center;
+    background: #fff;
   }
 
-  /* Hide desktop-only elements on mobile */
-  .sb-section:first-child,
-  .sb-divider:first-of-type {
-    display: none;
-  }
+  /* 데스크탑 전용 요소 숨기기 */
+  .desktop-only { display: none !important; }
+  .sb-section:first-child { display: none; }
+  .sb-divider { display: none; }
+  .sb-section:not(:first-child) { display: none; }
 
-  /* Filter strip — horizontal scroll */
+  /* 모바일 전용 영역만 보이게 */
+  #mobileFilterSection { display: flex !important; flex-direction: column; }
+
+  /* 필터 가로 스크롤 칩 */
   .filter-section-mobile {
     padding: 10px 0 0;
     flex-shrink: 0;
@@ -268,21 +295,18 @@ input[type=range]::-webkit-slider-thumb {
     display: flex;
     overflow-x: auto;
     gap: 6px;
-    padding: 0 14px 10px;
+    padding: 0 14px 0;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
   }
   .filter-scroll::-webkit-scrollbar { display: none; }
 
-  /* Override desktop filter-list to hide it */
-  .desktop-only { display: none !important; }
-
-  /* Intensity + adjust in compact row */
+  /* 강도 + 조절 버튼 한 줄 */
   .mobile-controls {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 0 14px 10px;
+    padding: 8px 14px 0;
     flex-shrink: 0;
   }
   .mobile-intensity {
@@ -295,39 +319,45 @@ input[type=range]::-webkit-slider-thumb {
   }
   .mobile-intensity input { flex: 1; }
 
-  /* Bottom sheet for adjust */
+  /* 바텀 시트 */
   .mobile-sheet-backdrop {
     display: none;
     position: fixed; inset: 0;
-    background: rgba(0,0,0,0.2);
+    background: rgba(0,0,0,0.25);
     z-index: 100;
   }
   .mobile-sheet-backdrop.open { display: block; }
+
   .mobile-sheet {
     position: fixed;
     bottom: 0; left: 0; right: 0;
     background: #fff;
-    border-radius: 16px 16px 0 0;
-    padding: 0 20px 40px;
+    border-radius: 20px 20px 0 0;
+    padding: 0 20px env(safe-area-inset-bottom, 20px);
+    padding-bottom: max(env(safe-area-inset-bottom), 24px);
     z-index: 101;
     transform: translateY(100%);
     transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
-    max-height: 80dvh;
+    max-height: 75dvh;
     overflow-y: auto;
   }
   .mobile-sheet.open { transform: translateY(0); }
+
   .sheet-handle {
     width: 36px; height: 4px;
-    background: #ddd; border-radius: 2px;
+    background: #e0e0e0; border-radius: 2px;
     margin: 12px auto 16px;
   }
   .sheet-title {
-    font-size: 14px; font-weight: 500;
+    font-size: 15px; font-weight: 600;
     margin-bottom: 20px; color: var(--ink);
   }
 
-  .adjust-toggle { font-size: 11px; height: 34px; white-space: nowrap; }
-  .sb-section { padding: 10px 14px 0; }
+  .adjust-toggle {
+    height: 32px; font-size: 11px;
+    white-space: nowrap; flex-shrink: 0;
+    width: auto; padding: 0 12px;
+  }
 }
 </style>
 </head>
